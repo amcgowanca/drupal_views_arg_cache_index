@@ -1,4 +1,4 @@
-## Views Arg Cache with Index Lookup
+## Views argument cache with indexing
 
 ### License
 
