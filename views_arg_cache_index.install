@@ -1,0 +1,81 @@
+<?php
+/**
+ * @file
+ * views_arg_cache_index.install
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function views_arg_cache_index_schema() {
+  $schema = array();
+  $schema['views_arg_cache_index'] = array(
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'view' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'display' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'type' => array(
+        'type' => 'varchar',
+        'length' => 25,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'cid' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('id'),
+  );
+  $schema['views_arg_cache_index_arguments'] = array(
+    'fields' => array(
+      'aid' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'size' => 'medium',
+      ),
+      'index_id' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'size' => 'medium',
+      ),
+      'arg_name' => array(
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => TRUE,
+      ),
+      'arg_value' => array(
+        'type' => 'text',
+        'size' => 'normal',
+        'not null' => FALSE,
+      ),
+    ),
+    'primary key' => array('aid'),
+    'foreign keys' => array(
+      'index_id' => array(
+        'table' => 'views_arg_cache_index',
+        'columns' => array('index_id' => 'id'),
+      ),
+    ),
+  );
+  return $schema;
+}

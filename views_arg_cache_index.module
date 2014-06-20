@@ -1,0 +1,146 @@
+<?php
+/**
+ * @file
+ * views_arg_cache_index.module
+ */
+
+/**
+ * Denotes the cache table name (`cache_views_data`).
+ */
+define('VIEWS_ARG_INDEX_CACHE_TABLE', 'cache_views_data');
+
+/**
+ * Implements hook_views_api().
+ */
+function views_arg_cache_index_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'views_arg_cache_index') . '/views',
+  );
+}
+
+/**
+ * Implements hook_views_plugins().
+ */
+function views_arg_cache_index_views_plugins() {
+  return array(
+    'cache' => array(
+      'views_arg_cache_index' => array(
+        'path' => drupal_get_path('module', 'views_arg_cache_index') . '/views',
+        'title' => t('Argument-based with index'),
+        'help' => t('Simple caching using keys based on arguments with lookup records.'),
+        'handler' => 'views_arg_cache_index_plugin_cache',
+        'uses options' => TRUE,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_flush_caches().
+ */
+function views_arg_cache_index_flush_caches() {
+  db_delete('views_arg_cache_index_arguments')->execute();
+  db_delete('views_arg_cache_index')->execute();
+  return array();
+}
+
+/**
+ * Clears the cache object(s) based on the view name, display id and arguments.
+ *
+ * @param string $view
+ *   The name of the view.
+ * @param string $display
+ *   The view's display id.
+ * @param array $args
+ *   An associative array of arguments to match for cache clearing.
+ * @param boolean $args_match_full
+ *   A boolean indicator to determine if the args should be matched
+ *   completely or if the args are only partial.
+ */
+function views_arg_cache_index_flush($view, $display, array $args = array(), $args_match_full = FALSE) {
+  if ($args_match_full) {
+    return views_arg_cache_index_flush_by_cid(_views_arg_cache_index_create_key($view, $display, $args));
+  }
+
+  $query = db_select('views_arg_cache_index', 'vi')
+    ->fields('vi', array('id', 'cid'));
+  $query->join('views_arg_cache_index_arguments', 'va', 'vi.id = va.index_id');
+
+  foreach ($args as $arg_name => $arg_value) {
+    if (is_array($arg_value)) {
+      $operation = isset($arg_value[1]) ? $arg_value[1] : '=';
+      $arg_value = $arg_value[0];
+    }
+    else {
+      $operation = '=';
+    }
+
+    $condition = db_or()
+      ->condition('va.arg_name', $arg_name)
+      ->condition('va.arg_value', $arg_value, $operation);
+    $query->condition($condition);
+  }
+  unset($arg_value, $arg_name);
+
+  $cids = $query->execute()->fetchAllKeyed();
+  if (!empty($cids)) {
+    $cids = array_keys($cids);
+    db_delete('views_arg_cache_index')
+      ->condition('id', array(), 'IN')
+      ->execute();
+    db_delete('views_arg_cache_index_arguments')
+      ->condition('index_id', array(), 'IN')
+      ->execute();
+    cache_clear_all($cids, VIEWS_ARG_CACHE_TABLE, FALSE);
+  }
+}
+
+/**
+ * Clears the cache object for a particular identifier.
+ *
+ * @param string $cid
+ *   The cache id of the cache object to clear.
+ */
+function views_arg_cache_index_flush_by_cid($cid) {
+  $result = db_select('views_arg_cache_index', 'v')
+    ->fields('v', array('id'))
+    ->condition('v.cid', $cid)
+    ->execute()
+    ->fetchAssoc();
+  if ($result) {
+    db_delete('views_arg_cache_index_arguments')
+      ->condition('index_id', $result['id'])
+      ->execute();
+    db_delete('views_arg_cache_index')
+      ->condition('id', $result['id'])
+      ->execute();
+    cache_clear_all($cid, VIEWS_ARG_INDEX_CACHE_TABLE, TRUE);
+  }
+}
+
+/**
+ * Creates the cache object's identifier.
+ *
+ * @param string $view
+ *   The name of the view.
+ * @param string $display
+ *   The view's display id.
+ * @param array $args
+ *   An array of the view's arguments with values.
+ * @return string
+ *   The cache object's identifier.
+ */
+function _views_arg_cache_index_create_key($view, $display, $args = NULL) {
+  $key = "{$view}:{$display}:";
+  if (!empty($args)) {
+    $args = is_array($args) ? $args : array($args);
+    foreach ($args as $id => $arg) {
+      $args[$id] = (string) $arg;
+    }
+
+    $key = $key . md5(serialize($args));
+  }
+
+  return $key;
+}
