@@ -57,6 +57,9 @@ function views_arg_cache_index_flush_caches() {
  * @param boolean $args_match_full
  *   A boolean indicator to determine if the args should be matched
  *   completely or if the args are only partial.
+ *
+ * @throws Exception
+ *   Thrown if `value` of a specific argument is not specified.
  */
 function views_arg_cache_index_flush($view, $display, array $args = array(), $args_match_full = FALSE) {
   if ($args_match_full) {
@@ -64,33 +67,81 @@ function views_arg_cache_index_flush($view, $display, array $args = array(), $ar
   }
 
   $query = db_select('views_arg_cache_index', 'vi')
+    ->distinct(TRUE)
     ->fields('vi', array('id', 'cid'));
   $query->join('views_arg_cache_index_arguments', 'va', 'vi.id = va.index_id');
 
+  $where = db_or();
+  $having = db_and();
   foreach ($args as $arg_name => $arg_value) {
     if (is_array($arg_value)) {
-      $operation = isset($arg_value[1]) ? $arg_value[1] : '=';
-      $arg_value = $arg_value[0];
+      if (!isset($arg_value['value'])) {
+        throw new Exception(t('Views argument cache index argument has no value specified for argument %argument.', array('%argument' => $arg_name)));
+      }
+
+      $arg_value += array(
+        'operation' => '',
+        'having' => FALSE,
+      );
     }
     else {
-      $operation = '=';
+      $arg_value = array(
+        'value' => $arg_value,
+        'operation' => '=',
+        'having' => FALSE,
+      );
     }
 
-    $condition = db_or()
-      ->condition('va.arg_name', $arg_name)
-      ->condition('va.arg_value', $arg_value, $operation);
-    $query->condition($condition);
+    $condition = db_and()->condition('va.arg_name', $arg_name);
+    if (is_array($arg_value['value'])) {
+      $or = db_or();
+      foreach ($arg_value['value'] as $value) {
+        if ('LIKE' == $arg_value['operation']) {
+          $value = '%' . db_like($value) . '%';
+        }
+        $or->condition('va.arg_value', $value, $arg_value['operation']);
+      }
+      $condition->condition($or);
+      unset($value, $or);
+    }
+    else {
+      if ('LIKE' == $arg_value['operation']) {
+        $arg_value['value'] = '%' . db_like($arg_value['value']) . '%';
+      }
+      $condition->condition('va.arg_value', $arg_value['value'], $arg_value['operation']);
+    }
+
+    if ($arg_value['having']) {
+      $having->condition($condition);
+    }
+    else {
+      $where->condition($condition);
+    }
   }
   unset($arg_value, $arg_name);
 
-  $cids = $query->execute()->fetchAllKeyed();
-  if (!empty($cids)) {
-    $cids = array_keys($cids);
+  if ($having->count()) {
+    $subquery = db_select('views_arg_cache_index_arguments', 'va')
+      ->distinct(TRUE)
+      ->fields('va', array('index_id'))
+      ->condition($where);
+    $query->condition('va.index_id', $subquery, 'IN')
+      ->condition($having);
+  }
+  else {
+    $query->condition($where);
+  }
+
+  $results = $query->execute()->fetchAllKeyed();
+
+  if (!empty($results)) {
+    $iids = array_keys($results);
+    $cids = array_values($results);
     db_delete('views_arg_cache_index')
-      ->condition('id', array(), 'IN')
+      ->condition('id', $iids, 'IN')
       ->execute();
     db_delete('views_arg_cache_index_arguments')
-      ->condition('index_id', array(), 'IN')
+      ->condition('index_id', $iids, 'IN')
       ->execute();
     cache_clear_all($cids, VIEWS_ARG_CACHE_TABLE, FALSE);
   }
