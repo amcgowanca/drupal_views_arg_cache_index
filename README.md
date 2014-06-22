@@ -27,7 +27,7 @@ projects[views_arg_cache_index][download][tag] = "7.x-0.1"
 * This module is downloaded using Git.
 * This module will be downloaded as the tagged release version 7.x-0.1.
 
-### Usage
+### Usage and Examples
 
 Similar to the [Views Arg Cache](http://drupal.org/project/views_arg_cache) contributed module, the Views Argument Cache with Indexing only flushes its cache objects with a Clear All Caches invocation (e.g. `drush cc all`) *OR* with the implementation of custom code cache flushing.
 
@@ -66,6 +66,44 @@ $arguments = array(
 
 views_arg_cache_index_flush('view_name', 'display_name', $arguments);
 ```
+
+#### Arguments
+
+Views Argument Caching with Indexing's `views_arg_cache_index_flush()` function accepts a more structured array of arguments when performing partial argument matching for performing cache flushing. The array of arguments are specified as an two-dimensional associative array keyed by the argument name. Each argument array should contain:
+
+* **value**: The value to perform the operation on.
+* **operation**: The operator. Default value is equals (`=`).
+* **having**: A boolean value to indicate whether a sub-query should be performed for non-having arguments, matched with this having argument. Default value is a negative boolean (`FALSE`).
+
+```php
+$arguments = array(
+  'argument_name' => array(
+    'value' => 'value-to-match',
+  ),
+);
+```
+
+##### Operators
+
+The operators accepted for performing query matches are the same as the accepted database abstraction layer's conditional operators (e.g. equality `=`). They are:
+
+* Equal (`=`) or Not-equals (`<>`)
+* Less-than (`<`) and Less-than or equals to (`<=`)
+* Greater-than (`>`) and Greater-than or equals to (`>=`)
+* Like (`LIKE`)
+
+When a LIKE operation is performed, the Views Argument Cache with Indexing performs the character escape on the specified `value` property using `db_like()` and concatenates the wildcard characters on the left and right hand side. For example, an argument defined as:
+
+```php
+$arguments = array(
+  'term_name' => array(
+    'value' => 'ABC',
+    'operation' => 'LIKE',
+  ),
+);
+```
+
+Would query all `term_name` named arguments whose values contain `ABC`. The `LIKE` operation is useful in situations where more than one value is accepted via a single argument (e.g. a list of taxonomy term identifiers).
 
 ### License
 
