@@ -80,7 +80,7 @@ function views_arg_cache_index_flush($view, $display, array $args = array(), $ar
       }
 
       $arg_value += array(
-        'operation' => '',
+        'operation' => '=',
         'having' => FALSE,
       );
     }
