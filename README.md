@@ -51,7 +51,7 @@ For example, perhaps you have a defined view that has two contextual arguments:
 When this view is rendered, the results and output of the view are cached with a unique cache identifier represented in the following string format:
 
 ```
-[view_name]:[display_id]:[md5[serialized-array-of-arguments]]
+view_name:display_id:md5(serialized-array-of-arguments)
 ```
 
 As a result, it is virtually impossible to clear the cache objects for all cached views who has the argument organic group identifier argument equalling one (`$gid = 1;`). Views Argument Cache with Indexing allows for such partial argument matching to occur. An example to clear all view cache objects with the organic group identifier value of one would be:
