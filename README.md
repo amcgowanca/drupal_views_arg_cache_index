@@ -46,7 +46,7 @@ When a view's cache objects need to be flushed and only *some* of the arguments 
 For example, perhaps you have a defined view that has two contextual arguments:
 
 * An organic group identifier, represented by `gid`.
-* A node identifier, represented by 'nid'.
+* A node identifier, represented by `nid`.
 
 When this view is rendered, the results and output of the view are cached with a unique cache identifier represented in the following string format:
 
