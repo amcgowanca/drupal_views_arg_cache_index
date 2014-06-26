@@ -179,6 +179,7 @@ function views_arg_cache_index_flush_by_cid($cid) {
  *   The view's display id.
  * @param array $args
  *   An array of the view's arguments with values.
+ *
  * @return string
  *   The cache object's identifier.
  */
