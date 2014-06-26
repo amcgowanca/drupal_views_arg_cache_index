@@ -107,7 +107,21 @@ Would query all `term_name` named arguments whose values contain `ABC`. The `LIK
 
 ### Integration with Rules
 
-Having the ability to flush caches with Rules upon certain actions is very important without the need to write numerous specialized actions for each View cached with the plugin available within. Using the Views Argument Cache with Indexing's integration with the Rules contributed module, a specialized action is provided so that upon the conditions of a Rule, cached views can be cleared that make use of *this* cache plugin.
+Having the ability to flush caches with [Rules](https://drupal.org/project/rules) upon certain actions is very important without the need to write numerous specialized actions for each View cached with the plugin available within. Using the Views Argument Cache with Indexing's integration with the Rules contributed module, a specialized action is provided so that upon the conditions of a Rule, cached views can be cleared that make use of *this* cache plugin.
+
+Arguments specified as part of the action's configuration must adhere to the following format:
+
+```
+[argument-name] [operator] [argument-value]
+```
+
+Where `[argument-name]` represents the name of the view's contextual argument in which the `[argument-value]` is used in conjunction to the `[argument-name]` for generating the cached view's identifier. Similarly to performing the cache flush programmatically with `views_arg_cache_index_flush()`, the `[operator]` must be specified as well. Using the previously started example above, the same argument specification can be achieved in the Rules action configuration with:
+
+```
+term_name LIKE abc
+```
+
+**Note:** Each separate argument must be specified on its own new line.
 
 ### License
 
