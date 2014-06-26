@@ -105,6 +105,10 @@ $arguments = array(
 
 Would query all `term_name` named arguments whose values contain `ABC`. The `LIKE` operation is useful in situations where more than one value is accepted via a single argument (e.g. a list of taxonomy term identifiers).
 
+### Integration with Rules
+
+Having the ability to flush caches with Rules upon certain actions is very important without the need to write numerous specialized actions for each View cached with the plugin available within. Using the Views Argument Cache with Indexing's integration with the Rules contributed module, a specialized action is provided so that upon the conditions of a Rule, cached views can be cleared that make use of *this* cache plugin.
+
 ### License
 
 This Views Argument Cache with Indexing is licensed under the [GNU General Public License](./LICENSE.md) version 2.
