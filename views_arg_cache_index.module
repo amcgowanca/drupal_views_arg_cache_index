@@ -187,6 +187,10 @@ function _views_arg_cache_index_create_key($view, $display, $args = NULL) {
   if (!empty($args)) {
     $args = is_array($args) ? $args : array($args);
     foreach ($args as $id => $arg) {
+      if (is_array($arg) && isset($arg['value'])) {
+        $arg = $arg['value'];
+      }
+
       $args[$id] = (string) $arg;
     }
 
