@@ -123,6 +123,10 @@ term_name LIKE abc
 
 **Note:** Each separate argument must be specified on its own new line.
 
+### Drupal.org & GitHub
+
+The ongoing development and maintenance of Views Argument Cache with Indexing is being done on [GitHub](https://github.com/amcgowanca/drupal_views_arg_cache_index). Should you have an issue or require support, please submit an issue or request for assistance on to the [Drupal.org Issue Queue](https://www.drupal.org/project/issues/2296039?status=All&categories=All).
+
 ### License
 
 This Views Argument Cache with Indexing is licensed under the [GNU General Public License](./LICENSE.md) version 2.
