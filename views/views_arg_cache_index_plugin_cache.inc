@@ -50,9 +50,11 @@ class views_arg_cache_index_plugin_cache extends views_plugin_cache {
       case 'results':
         $cid = $this->get_results_key();
         break;
+
       case 'output':
         $cid = $this->get_output_key();
         break;
+
       default:
         return;
     }

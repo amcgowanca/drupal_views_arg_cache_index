@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * views_arg_cache_index.rules.inc
+ * Contains Rules hooks and action callbacks.
  */
 
 /**
