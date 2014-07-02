@@ -121,14 +121,19 @@ function views_arg_cache_index_flush($view, $display, array $args = array(), $ar
   unset($arg_value, $arg_name);
 
   if ($having->count()) {
-    $subquery = db_select('views_arg_cache_index_arguments', 'va')
-      ->distinct(TRUE)
-      ->fields('va', array('index_id'))
-      ->condition($where);
-    $query->condition('va.index_id', $subquery, 'IN')
-      ->condition($having);
+    if ($where->count()) {
+      $subquery = db_select('views_arg_cache_index_arguments', 'va')
+        ->distinct(TRUE)
+        ->fields('va', array('index_id'))
+        ->condition($where);
+      $query->condition('va.index_id', $subquery, 'IN')
+        ->condition($having);
+    }
+    else {
+      $query->condition($having);
+    }
   }
-  else {
+  elseif ($where->count()) {
     $query->condition($where);
   }
 
