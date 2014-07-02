@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * views_arg_cache_index.install
+ * Installation, Schema and Update hooks implementation.
  */
 
 /**

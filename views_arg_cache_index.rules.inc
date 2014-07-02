@@ -39,6 +39,7 @@ function views_arg_cache_index_rules_action_info() {
  * @param string $view_info
  *   The view's name and display id to clear ([view-name]:[display-id]).
  * @param string $arguments
+ *   The string of arguments, unprocessed, used for this rule for clearing.
  */
 function views_arg_cache_index_rules_cache_flush($view_info, $arguments) {
   list($view_name, $display_id) = explode(':', $view_info);

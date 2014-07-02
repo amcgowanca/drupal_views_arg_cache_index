@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * views_arg_cache_index.module
+ * Contains module hooks and api implementation.
  */
 
 /**
  * Denotes the cache table name (`cache_views_data`).
  */
-define('VIEWS_ARG_INDEX_CACHE_TABLE', 'cache_views_data');
+define('VIEWS_ARG_CACHE_INDEX_CACHE_TABLE', 'cache_views_data');
 
 /**
  * Implements hook_views_api().
@@ -54,7 +54,7 @@ function views_arg_cache_index_flush_caches() {
  *   The view's display id.
  * @param array $args
  *   An associative array of arguments to match for cache clearing.
- * @param boolean $args_match_full
+ * @param bool $args_match_full
  *   A boolean indicator to determine if the args should be matched
  *   completely or if the args are only partial.
  *
@@ -188,7 +188,7 @@ function views_arg_cache_index_flush_by_cid($cid) {
  * @return string
  *   The cache object's identifier.
  */
-function _views_arg_cache_index_create_key($view, $display, $args = NULL) {
+function _views_arg_cache_index_create_key($view, $display, array $args = NULL) {
   $key = "{$view}:{$display}:";
   if (!empty($args)) {
     $args = is_array($args) ? $args : array($args);

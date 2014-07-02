@@ -2,7 +2,6 @@ name = Views Arg Cache with index lookup
 description = Provides a simple Views cache plugin to cache a view by its arguments with enhanced capabilities of performing lookups of the view's cache identifier by individual argument values.
 package = Views
 core = 7.x
-version = 7.x-0.3
 
 files[] = views/views_arg_cache_index_plugin_cache.inc
 

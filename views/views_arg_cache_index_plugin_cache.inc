@@ -1,15 +1,23 @@
 <?php
 /**
  * @file
- * plugins/views_arg_cache_index_plugin_cache.inc
+ * Contains class views_arg_cache_index_plugin_cache.
  */
 
 /**
  * Views cache plugin for caching views by arguments.
  */
 class views_arg_cache_index_plugin_cache extends views_plugin_cache {
-  public $table = VIEWS_ARG_INDEX_CACHE_TABLE;
+  /**
+   * The database table name to store cache data.
+   *
+   * @var string
+   */
+  public $table = VIEWS_ARG_CACHE_INDEX_CACHE_TABLE;
 
+  /**
+   * {@inheritdoc}
+   */
   public function get_results_key() {
     if (!isset($this->_results_key)) {
       $args = $this->truncate_args($this->view->args);
@@ -18,6 +26,9 @@ class views_arg_cache_index_plugin_cache extends views_plugin_cache {
     return $this->_results_key;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function get_output_key() {
     if (!isset($this->_output_key)) {
       $key_data = array(
@@ -29,6 +40,9 @@ class views_arg_cache_index_plugin_cache extends views_plugin_cache {
     return $this->_output_key;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function cache_set($type) {
     parent::cache_set($type);
 
@@ -73,6 +87,22 @@ class views_arg_cache_index_plugin_cache extends views_plugin_cache {
     }
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function cache_flush() {
+    views_arg_cache_index_flush($this->view->name, $this->display->id, $this->view->args, TRUE);
+  }
+
+  /**
+   * Truncates argument array for key generation to number of keys used.
+   *
+   * @param array $args
+   *   The array of arguments prior to slicing.
+   *
+   * @return array
+   *   Returns the sliced array of arguments for max number of elements.
+   */
   protected function truncate_args(array $args = array()) {
     if ($this->options['arg_count']) {
       return array_slice($args, 0, $this->options['arg_count']);
@@ -80,10 +110,16 @@ class views_arg_cache_index_plugin_cache extends views_plugin_cache {
     return $args;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function summary_title() {
     return t('Argument-based with index');
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function option_definition() {
     $options = parent::option_definition();
     $options['arg_count'] = array(
@@ -92,13 +128,13 @@ class views_arg_cache_index_plugin_cache extends views_plugin_cache {
     return $options;
   }
 
-  public function option_defaults(&$options) {
-    $options['arg_count'] = 0;
-  }
-
+  /**
+   * {@inheritdoc}
+   */
   public function options_form(&$form, &$form_state) {
-    $options = array(0 => t('All'));
+    parent::options_form($form, $form_state);
 
+    $options = array(0 => t('All'));
     $args_count = count($this->view->argument);
     if (1 <= $args_count) {
       for ($i = 1; $i <= $args_count; $i++) {
