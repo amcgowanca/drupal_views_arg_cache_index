@@ -76,6 +76,16 @@ function views_arg_cache_index_schema() {
         'columns' => array('index_id' => 'id'),
       ),
     ),
+    'indexes' => array(
+      'views_arg_cache_index_arguments_index_id' => array('index_id'),
+    ),
   );
   return $schema;
+}
+
+/**
+ * Adds index using `index_id` and `aid` fields in `views_arg_cache_arguments`.
+ */
+function views_arg_cache_index_update_7001() {
+  db_add_index('views_arg_cache_arguments', 'views_arg_cache_index_arguments_index_id', array('index_id'));
 }
