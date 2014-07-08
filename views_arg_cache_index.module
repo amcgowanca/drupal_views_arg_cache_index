@@ -40,8 +40,8 @@ function views_arg_cache_index_views_plugins() {
  * Implements hook_flush_caches().
  */
 function views_arg_cache_index_flush_caches() {
-  db_delete('views_arg_cache_index_arguments')->execute();
-  db_delete('views_arg_cache_index')->execute();
+  db_truncate('views_arg_cache_index_arguments')->execute();
+  db_truncate('views_arg_cache_index')->execute();
   return array();
 }
 
